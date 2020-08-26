@@ -1,0 +1,19 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Build and Execute') {
+            steps {
+                echo 'Execute the script to build..'
+                bat label: '', script: '''cd C:\\Users\\VaibhavGupta\\Desktop\\GitHub_Robot\\RobotWebDemo\\RobotProject
+				robot -d TestResults TestScript'''
+            }
+        }
+        stage('Generate Reports') {
+            steps {
+                echo 'Generating Reports....'
+                robot logFileName: 'log.html', otherFiles: '*screenshot*.png', outputFileName: 'output.xml', outputPath: 'C:\\Users\\VaibhavGupta\\Desktop\\GitHub_Robot\\RobotWebDemo\\RobotProject\\TestResults', reportFileName: 'report.html'
+            }
+        }
+    }
+}
