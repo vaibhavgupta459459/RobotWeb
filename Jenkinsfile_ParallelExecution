@@ -1,0 +1,91 @@
+pipeline 
+{
+	agent none
+	stages 
+	{
+		stage('non parallel stage')
+		{
+			agent 
+			{
+				label "master"
+			}
+			steps 
+			{
+				echo 'hello and welcome from master'
+			}
+		}
+		stage('parallel stage') 
+		{
+			parallel 
+			{
+				stage('Fetch data from GitHub on Agent_Test1')
+				{
+					agent 
+					{
+						label "Agent_Test1"
+					}
+					steps
+					{
+						git credentialsId: 'ac911d69-5713-49e1-bb3b-ef1fd70c5272', url: 'https://github.com/vaibhavgupta459459/RobotWeb.git'
+					}
+				}
+				stage('Fetch data from GitHub on Agent_Test2')
+				{
+					agent 
+					{
+						label "Agent_Test2"
+					}
+					steps
+					{
+						git credentialsId: 'ac911d69-5713-49e1-bb3b-ef1fd70c5272', url: 'https://github.com/vaibhavgupta459459/RobotWeb.git'
+					}
+				}
+				stage('Execute Robot Test on Agent_Test1')
+				{
+					agent 
+					{
+						label "Agent_Test1"
+					}
+					steps
+					{
+						bat label: '', script: 'robot -d TestResults RobotProject/TestScript'
+					}
+				}
+				stage('Execute Robot Test on Agent_Test2')
+				{
+					agent 
+					{
+						label "Agent_Test2"
+					}
+					steps
+					{
+						bat label: '', script: 'robot -d TestResults RobotProject/TestScript'
+					}
+				}
+				stage('Load Results on Agent_Test1')
+				{
+					agent 
+					{
+						label "Agent_Test1"
+					}
+					steps
+					{
+						robot logFileName: 'log.html', otherFiles: '*screenshot*.png', outputFileName: 'output.xml', outputPath: 'TestResults', reportFileName: 'report.html'
+					}
+				}
+				stage('Load Results on Agent_Test2')
+				{
+					agent 
+					{
+						label "Agent_Test2"
+					}
+					steps
+					{
+						robot logFileName: 'log.html', otherFiles: '*screenshot*.png', outputFileName: 'output.xml', outputPath: 'TestResults', reportFileName: 'report.html'
+					}
+				}
+			}
+		}
+		
+	}
+}
