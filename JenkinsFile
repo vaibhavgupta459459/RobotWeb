@@ -1,0 +1,24 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Fetch Data From Github') {
+            steps {
+                echo 'Fetching Data from Github..'
+                git credentialsId: 'ac911d69-5713-49e1-bb3b-ef1fd70c5272', url: 'https://github.com/vaibhavgupta459459/RobotWeb.git'
+            }
+        }
+        stage('Build') {
+            steps {
+                echo 'Execute the script to build..'
+                bat label: '', script: 'robot -d TestResults RobotProject/TestScript'
+            }
+        }
+        stage('Generate Reports') {
+            steps {
+                echo 'Generating Reports....'
+                robot logFileName: 'log.html', otherFiles: '*screenshot*.png', outputFileName: 'output.xml', outputPath: 'TestResults', reportFileName: 'report.html'
+            }
+        }
+    }
+}
